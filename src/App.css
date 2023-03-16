@@ -1,0 +1,49 @@
+#root {
+  background-image: url('./assets/background.jpg');
+  background-size: cover;
+}
+.input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+}
+ 
+input[type="number"] {
+  -moz-appearance: textfield;
+}
+.App{
+  min-height: 100vh;
+}
+nav{
+  width: 100% ;
+  padding: 1em 8em;
+  position: sticky;
+  top: 0;
+  display: flex;  
+  align-items: center;
+  justify-content: space-between; 
+}
+.logo{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: max-content;
+  font-weight: 700;
+}
+.logo img{
+  padding: 0 0.5em 0 0 ;
+}
+.hero h2{
+  font-family: 'stretch-regular', sans-serif;
+}
+.Quizpage{
+  min-height: 100vh;
+}
+.Quizbody{
+  padding: 2em 8em;
+}
+
+
+.cont{
+  height: 70vh;
+  padding: 10px;
+}
