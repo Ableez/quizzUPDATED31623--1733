@@ -17,11 +17,8 @@ export default function Root() {
       }
     }
     window.addEventListener("scroll", onScroll);
-
-    // Remove the event listener on cleanup
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
-
   function auth() {
     if(getCredentials){
       window.location.href = "/quiz";

@@ -58,13 +58,9 @@ export default function Quiz() {
 
   const validateAnswer = (e) => {
     e.preventDefault();
-    const { value } = e.target;
-    if (value === "next") {
-      setCurrQuestion((prev) => prev + 1);
-    } else if (value === "answer") {
+    if (selectedOption) {
       setShowAns(true);
     }
-
     if (selectedOption === questions[currQuestion].correct_answer) {
       setAnsCorrect(true);
     }
@@ -88,21 +84,14 @@ export default function Quiz() {
   }
   useEffect(() => {
     function onScroll() {
-      if (window.scrollY > 200) {
+      if (window.scrollY > 20) {
         setScroll(true);
       } else {
         setScroll(false);
       }
     }
     window.addEventListener("scroll", onScroll);
-    const goodRand = reactionsObj.good[Math.floor(Math.random() * reactionsObj.good.length)]
-    const badRand = reactionsObj.bad[Math.floor(Math.random() * reactionsObj.bad.length)]
-    // Remove the event listener on cleanup
     return () => window.removeEventListener("scroll", onScroll);
-    
-
-
-
   }, []);
 
   const details = JSON.parse(localStorage.getItem("details"));
@@ -119,45 +108,41 @@ export default function Quiz() {
   function startQuiz() {
     setBeginQuiz(true);
   }
+  const goodReactions = [
+    "1f389",
+    "270c",
+    "1f339",
+    "1f64c",
+    "1f44f",
+    "2714",
+    "2728",
+    "1f38a",
+  ];
+  const badReactions = [
+    "1f615",
+    "1f614",
+    "1f62d",
+    "1f612",
+    "1f620",
+    "274c",
+    "1f44e",
+    "1f4a9",
+  ];
 
-  function getReactions() {
-    const goodReactions = [
-      "1f389",
-      "270c",
-      "1f339",
-      "1f64c",
-      "1f44f",
-      "2714",
-      "2728",
-      "1f970",
-      "1f38a",
-    ];
-    const badReactions = [
-      "1f615",
-      "1f614",
-      "1f62d",
-      "1f612",
-      "1f620",
-      "274c",
-      "1f44e",
-      "1f4a9",
-    ];
-
-    const good = goodReactions.map((unicode) => {
-      return String.fromCodePoint(parseInt(unicode, 16));
-    });
-
-    const bad = badReactions.map((unicode) => {
-      return String.fromCodePoint(parseInt(unicode, 16));
-    });
-
-    return { good, bad };
+  function nextQuestion() {
+    if (showAns) {
+      setCurrQuestion((prev) => prev + 1);
+    }
   }
 
-  const reactionsObj = getReactions();
+  function showReaction(ansCorrect, reactionType) {
+    const reactions = reactionType === "good" ? goodReactions : badReactions;
+    const randomIndex = Math.floor(Math.random() * reactions.length);
+    const reactionCode = reactions[randomIndex];
+    const reaction = String.fromCodePoint(parseInt(reactionCode, 16));
 
-  const an = true;
-
+    return ansCorrect ? reaction : `${reaction}`;
+  }
   return (
     <div className="Quizpage">
       <nav
@@ -237,7 +222,7 @@ export default function Quiz() {
               className="font-bold text-lime-700"
             >
               Question{" "}
-              <span className="text-gray-400 ">1 of {questions.length}</span>
+              <span className="text-gray-400 ">{currQuestion + 1} of {questions.length}</span>
             </p>
           </div>
           <div className="question py-6">
@@ -249,10 +234,17 @@ export default function Quiz() {
             {questions[currQuestion].options.map((option, index) => {
               return (
                 <button
-                  className={`px-14 ring-1 ring-zinc-200 hover:bg-lime-200 transition-all duration-300 font-bold mr-2 rounded-2xl py-2 ${
-                    selectedOption === option ? "bg-lime-300" : "bg-lime-0"
+                  className={`px-14 ring-1  ring-zinc-200 hover:bg-lime-200 disabled:border-lime-100 disabled:cursor-not-allowed transition-all duration-300 font-bold mr-2 rounded-2xl py-2 ${
+                    selectedOption === option
+                      ? "bg-lime-300 disabled:bg-lime-300"
+                      : "bg-lime-0"
                   } `}
+                  style={{
+                    backgroundColor: showAns && "transparent",
+                  }}
                   value={option}
+                  disabled={showAns}
+                  id="ansbtn"
                   onClick={(e) => handleOptionClick(e)}
                   key={index}
                 >
@@ -270,11 +262,8 @@ export default function Quiz() {
                     ansCorrect ? "text-green-600" : "text-red-500"
                   }`}
                 >
-                  {questions[currQuestion].correct_answer}
-{' '}
-                  {ansCorrect
-                      ? `${reactionsObj.good[Math.floor(Math.random() * reactionsObj.good.length)]}`
-                      : `Wrong! ${reactionsObj.bad[Math.floor(Math.random() * reactionsObj.bad.length)]}`}
+                  {questions[currQuestion].correct_answer}{" "}
+                  {showReaction(ansCorrect, ansCorrect ? "good" : "bad")}
                 </span>
               ) : (
                 ""
@@ -293,17 +282,25 @@ export default function Quiz() {
             >
               Prev
             </button>
-            <button
-              className={`px-14 ring-1 ring-zinc-200  transition-all duration-300 text-white ${
-                selectedOption
-                  ? "bg-lime-600"
-                  : "bg-gray-300 text-gray-500 cursor-not-allowed "
-              } font-bold mr-2 rounded-2xl py-2`}
-              onClick={validateAnswer}
-              value={selectedOption ? "answer" : "Next"}
-            >
-              {selectedOption ? "Check Answer" : "Next"}
-            </button>
+            {!showAns ? (
+              <button
+                className={`px-14 ring-1 rounded-2xl ring-zinc-200  transition-all duration-300 text-white ${
+                  selectedOption
+                    ? "bg-lime-600"
+                    : "bg-gray-300 text-gray-900 cursor-not-allowed "
+                } font-bold mr-2 rounded-2xl py-2`}
+                onClick={validateAnswer}
+              >
+                {selectedOption ? "Check Answer" : "Next"}
+              </button>
+            ) : (
+              <button
+                className="px-14 ring-1 ring-zinc-200 rounded-2xl  transition-all duration-300 text-white bg-lime-600"
+                onClick={nextQuestion}
+              >
+                Next
+              </button>
+            )}
           </div>
         </div>
       )}

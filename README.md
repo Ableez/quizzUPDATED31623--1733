@@ -5,3 +5,16 @@
 simple quiz application, just as a side project.
 
 # OPEN FOR IDEAS AND FEATURES CONTRIBUTIONS
+
+
+
+
+
+To run:
+open up the terminal in your code editor
+type in:
+
+```
+npm install
+npm run dev
+```
